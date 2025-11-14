@@ -4,6 +4,8 @@ import { Product, CartItem } from '@/types';
 
 interface CartStore {
   items: CartItem[];
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
   addItem: (product: Product) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -16,31 +18,34 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      _hasHydrated: false,
+      
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state,
+        });
+      },
       
       addItem: (product) => {
-        try {
-          set((state) => {
-            const existingItem = state.items.find(
-              (item) => item.product.id === product.id
-            );
-            
-            if (existingItem) {
-              return {
-                items: state.items.map((item) =>
-                  item.product.id === product.id
-                    ? { ...item, quantity: item.quantity + 1 }
-                    : item
-                ),
-              };
-            }
-            
+        set((state) => {
+          const existingItem = state.items.find(
+            (item) => item.product.id === product.id
+          );
+          
+          if (existingItem) {
             return {
-              items: [...state.items, { product, quantity: 1 }],
+              items: state.items.map((item) =>
+                item.product.id === product.id
+                  ? { ...item, quantity: item.quantity + 1 }
+                  : item
+              ),
             };
-          });
-        } catch (error) {
-          console.error('Error adding item to cart:', error);
-        }
+          }
+          
+          return {
+            items: [...state.items, { product, quantity: 1 }],
+          };
+        });
       },
       
       removeItem: (productId) => {
@@ -81,6 +86,9 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'magic-farm-cart',
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

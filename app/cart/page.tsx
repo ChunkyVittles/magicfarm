@@ -3,10 +3,28 @@
 import Link from 'next/link';
 import { useCartStore } from '@/store/cartStore';
 import { Minus, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, getTotal } = useCartStore();
+  const { items, removeItem, updateQuantity, getTotal, _hasHydrated } = useCartStore();
+  const [isClient, setIsClient] = useState(false);
   const total = getTotal();
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  // Show loading state until hydration is complete
+  if (!isClient || !_hasHydrated) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-4xl font-serif text-earth-800 mb-8">Shopping Cart</h1>
+        <div className="bg-white rounded-lg shadow-md p-8 text-center">
+          <p className="text-earth-600">Loading cart...</p>
+        </div>
+      </div>
+    );
+  }
   
   if (items.length === 0) {
     return (

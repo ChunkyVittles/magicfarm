@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, getTotal, clearCart } = useCartStore();
+  const { items, getTotal, clearCart, _hasHydrated } = useCartStore();
   const total = getTotal();
   
   const [formData, setFormData] = useState({
@@ -51,9 +51,6 @@ export default function CheckoutPage() {
       createdAt: new Date().toISOString(),
     };
     
-    // In a real app, you'd send this to your backend
-    console.log('Order created:', order);
-    
     // Store order in localStorage for confirmation page
     localStorage.setItem('currentOrder', JSON.stringify(order));
     
@@ -62,8 +59,23 @@ export default function CheckoutPage() {
     router.push('/payment');
   };
   
+  useEffect(() => {
+    if (_hasHydrated && items.length === 0) {
+      router.replace('/cart');
+    }
+  }, [_hasHydrated, router]);
+  
+  if (!_hasHydrated) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center">
+          <p className="text-earth-600">Loading checkout...</p>
+        </div>
+      </div>
+    );
+  }
+  
   if (items.length === 0) {
-    router.push('/cart');
     return null;
   }
   
@@ -239,7 +251,7 @@ export default function CheckoutPage() {
             
             <div className="bg-sage-50 p-4 rounded-lg">
               <p className="text-sm text-earth-700">
-                💳 Next step: You'll be directed to complete payment via Venmo
+                Next step: You'll be directed to complete payment via Venmo
               </p>
             </div>
           </div>

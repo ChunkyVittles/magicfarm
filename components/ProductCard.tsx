@@ -14,13 +14,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [isAdded, setIsAdded] = useState(false);
   
   const handleAddToCart = () => {
-    try {
-      addItem(product);
-      setIsAdded(true);
-      setTimeout(() => setIsAdded(false), 2000);
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-    }
+    addItem(product);
+    setIsAdded(true);
+    setTimeout(() => setIsAdded(false), 2000);
   };
   
   return (
