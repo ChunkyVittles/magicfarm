@@ -27,6 +27,12 @@ export default function Header() {
               Shop
             </Link>
             <Link 
+              href="/stay" 
+              className="text-earth-700 hover:text-sage-600 transition-colors font-medium"
+            >
+              Stay
+            </Link>
+            <Link 
               href="/about" 
               className="text-earth-700 hover:text-sage-600 transition-colors font-medium"
             >
